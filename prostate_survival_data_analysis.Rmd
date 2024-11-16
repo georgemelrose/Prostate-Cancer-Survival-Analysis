@@ -1,0 +1,65 @@
+---
+title: "EDA & Survival Analysis of the Prostate Cancer 'prostateSurvival' Dataset"
+author: "George Melrose"
+date: "`r Sys.Date()`"
+output: 
+ html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+rm(list = ls())
+
+knitr::opts_chunk$set(echo = TRUE,warning = FALSE, message = FALSE)
+
+pacman::p_load(tidyverse,icd,knitr,kableExtra,finalfit,lubridate,data.table,
+               janitor,flextable,survival,survminer,cmprsk,rmdHelpers, ggrepel,
+               scales,RColorBrewer,GGally,randomForest, caret,DT,asaur)
+
+data("prostateSurvival")
+
+```
+
+## 0 - Domain Knowledge of Prostate Cancer and the 'prostateSurvival' dataset
+
+### References 
+
+* CRUK 'About Cancer', 'Prostate Cancer' - https://www.cancerresearchuk.org/about-cancer/prostate-cancer/stages/localised-prostate-cancer
+
+* asaur package datasets - https://cran.r-project.org/web/packages/asaur/asaur.pdf
+
+* Kaggle grandmaster tanulsingh077
+Mr_KnowNothing 'Prostate Cancer: In Depth Understanding,EDA , Model' - https://www.kaggle.com/code/tanulsingh077/prostate-cancer-in-depth-understanding-eda-model
+
+*Oxford Very Short Introductions: Cancer
+
+*Oxford Concise Colour Medical Dictionary  
+
+The description of the dataset from the *"Applied Survival Analysis Using R"* ***(asaur)*** package - 
+
+"This data set contains survival times for two competing causes: time from prostate cancer diagnosis to death from prostate cancer, and time from prostate cancer diagnosis to death from other causes. 
+
+The data set also contains information on several risk factors. The data in this data set are simulated from detailed competing risk survival curves and counts of numbers of patients per group presented in Lu-Yao et al. (2009). 
+
+Thus, the simulated data presented here contain many of the characteristics of the original SEER-Medicare prostate cancer data used in Lu-Yao et al. (2009)."
+
+The dataframe has 14,294 observations on the following 5 variables:
+
+* **grade** - a factor with levels 'mode' (moderately differentiated) and 'poor' (poorly differentiated).
+
+* **stage** - a factor with levels 'T1ab' (Stage T1, clinically diagnosed), 'T1c' (Stage T1, diagnosed via a PSA test), and 'T2' (means the cancer is completely inside the prostate gland. It can usually be seen on a scan, or felt during an examination.)
+
+
+
+
+
+## 1 - Formatting & Initial look at Data
+
+
+```{r looking at the dataset}
+str(prostateSurvival)
+
+datatable(prostateSurvival)
+```
