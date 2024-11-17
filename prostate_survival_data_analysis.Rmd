@@ -26,20 +26,19 @@ data("prostateSurvival")
 
 ### References 
 
-* CRUK 'About Cancer', 'Prostate Cancer' - https://www.cancerresearchuk.org/about-cancer/prostate-cancer/stages/localised-prostate-cancer
+* **CRUK 'About Cancer', 'Prostate Cancer'** - https://www.cancerresearchuk.org/about-cancer/prostate-cancer/stages/localised-prostate-cancer
 
-* asaur package datasets - https://cran.r-project.org/web/packages/asaur/asaur.pdf
+* **asaur package datasets** - https://cran.r-project.org/web/packages/asaur/asaur.pdf
 
-* Kaggle grandmaster tanulsingh077
-Mr_KnowNothing 'Prostate Cancer: In Depth Understanding,EDA , Model' - https://www.kaggle.com/code/tanulsingh077/prostate-cancer-in-depth-understanding-eda-model
+* **Kaggle grandmaster tanulsingh077 Mr_KnowNothing 'Prostate Cancer: In Depth Understanding,EDA , Model'** - https://www.kaggle.com/code/tanulsingh077/prostate-cancer-in-depth-understanding-eda-model
 
-* Oxford Very Short Introductions: Cancer
+* **Oxford Very Short Introductions: Cancer**
 
-* Oxford Concise Colour Medical Dictionary 
+* **Oxford Concise Colour Medical Dictionary** 
 
-* "Prostate Cancer Overview" (https://www.youtube.com/watch?v=ZdU5uvyafo4) and "What You Need To Know About Prostate Cancer" (https://www.youtube.com/watch?v=u4O4yNvkpqQ)  by Dr.Matthew Cooperberg from the University of California Television Youtube Channel. Abbreviated ***UCTV*** . 
+* **"Prostate Cancer Overview" (https://www.youtube.com/watch?v=ZdU5uvyafo4) and "What You Need To Know About Prostate Cancer" (https://www.youtube.com/watch?v=u4O4yNvkpqQ)  by Dr.Matthew Cooperberg from the University of California Television Youtube Channel**. Abbreviated ***UCTV*** . 
 
-* US Government National Cancer Institute "Prostate Cancer Treatment (PDQ®)–Health Professional Version" - https://www.cancer.gov/types/prostate/hp/prostate-treatment-pdq . Abbreviated ***NCI*** .
+* **US Government National Cancer Institute "Prostate Cancer Treatment (PDQ®)–Health Professional Version"** - https://www.cancer.gov/types/prostate/hp/prostate-treatment-pdq . Abbreviated ***NCI*** .
 
 ### Prostate Cancer Overview
 
@@ -81,17 +80,50 @@ knitr::include_graphics("C:/Users/gam55/Documents/Prostate-Cancer-Survival-Analy
 
 * **Symptoms** - Most prostate cancers are found through screening therefore prostate cancer symptoms are infrequent during diagnosis. Nonetheless, prostate tumour growth can produce symptoms of urinary obstruction: decreased urinary stream; nocturia; incomplete bladder emptying. 
 
-  These are non-specific symptoms and can also be indicative of **Benign Prostatic Hyperplasia (BPH)** - the prostate becoming enlarged, typically in older men. This can result in obstruction of the neck of the bladder, impairing urination. The bladder dilates and increased pressure is transmitted to the kidney nephrons, impairing and damaging them [Oxford Medical Dictionary].   
+  These are non-specific symptoms and can also be indicative of **Benign Prostatic Hyperplasia (BPH)** - the prostate becoming enlarged, typically in older men. This can result in obstruction of the neck of the bladder, impairing urination. The bladder dilates and increased pressure is transmitted to the kidney nephrons, impairing and damaging them [Oxford Medical Dictionary].It is rare nowadays with widespread screening however prostate cancer metastasis may have already happened with symptoms of bone pain and pathological fractures.
+   
   
 ```{r bph image}
 knitr::include_graphics("C:/Users/gam55/Documents/Prostate-Cancer-Survival-Analysis/bph_image.jpg")
 ```  
 
-  It is rare nowadays with widespread screening however prostate cancer metastasis may have already happened with symptoms of bone pain and pathological fractures.
 
 
+* **Diagnosis** - Different tests and procedures can be used to diagnose prostate cancer. A **Digital Rectal Exam (DRE)** is when a clinician inserts a finger into the rectum to feel the prostate through the rectal wall for abnormalities. 
 
-* **Diagnosis** - Different 
+```{r dre image}
+knitr::include_graphics("C:/Users/gam55/Documents/Prostate-Cancer-Survival-Analysis/dre.jpg")
+```  
+
+**Prostate-specific antigen (PSA) test** - A test to measure the levels of PSA in the blood. PSA levels are elevated in prostate cancer but can also be elevated by stress and inflammation on the prostate - after a long bicycle ride for example.
+
+**Prostate-specific membrane antigen (PSMA) Positron Emission Tomography (PET) scan** - An imaging procedure to help find prostate cancer cells that have spread outside of the prostate, into bone, lymph nodes, or other organs. A cell-targeting molecule linked to a radioactive substance is injected into the body and travels through the blood. It attaches to a protein called PSMA that is found on the surface of prostate cancer cells. A PET scanner detects high concentrations of the radioactive molecule and shows where the prostate cancer cells are in the body. 
+
+**Transrectal ultrasound** - a probe approximately the size of a finger is inserted into the rectum to check the prostate. The probe ultrasound off internal tissues or organs and make echoes. The echoes form a picture of body tissues called a sonogram. Transrectal ultrasound may be used during a biopsy procedure -  transrectal ultrasound guided biopsy.
+
+```{r transrectal ultrasound image}
+knitr::include_graphics("C:/Users/gam55/Documents/Prostate-Cancer-Survival-Analysis/transrectal_ultrasound.jpg")
+```  
+
+
+**Transrectal magnetic resonance imaging (MRI)** - A probe that gives off radio waves is inserted into the rectum near the prostate. This helps the MRI machine make clearer pictures of the prostate and nearby tissue. A transrectal MRI is done to find out if the cancer has spread outside the prostate into nearby tissues. This procedure is also called nuclear magnetic resonance imaging (NMRI). Transrectal MRI may be used during a biopsy procedure -  transrectal MRI guided biopsy.
+
+### Staging Prostate Cacner using the Grade Group and PSA Level
+
+If cancer is found, it will be given a grade. The grade of the cancer describes how abnormal the cancer cells look under a microscope and how quickly the cancer is likely to spread. The grade is also called the **Gleason score**.
+
+The prostate tissue samples are checked to see how much the tumor tissue is like the normal prostate tissue and to find the two main cell patterns. The primary pattern describes the most common tissue pattern, and the secondary pattern describes the next most common pattern. Each pattern is given a grade from 3 to 5, with grade 3 looking the most like normal prostate tissue and grade 5 looking the most abnormal. The two grades are then added to get a Gleason score.
+
+The Gleason score can range from 6 to 10. The higher the Gleason score, the more likely the cancer will metastasise. A score of 6 is a low-grade cancer; a score of 7 is a medium-grade cancer; and a score of 8, 9, or 10 is a high-grade cancer. For example, if the most common tissue pattern is grade 3 and the secondary pattern is grade 4, it means that most of the cancer is grade 3 and less of the cancer is grade 4. The grades are added for a Gleason score of 7, and it is a medium-grade cancer. The score may be written as 3+4=7, Gleason 7/10, or combined Gleason score of 7.
+
+* **Stage I** - Cancer is only in the prostate. The cancer is not felt during a DRE and is found by needle biopsy done for high PSA level or in a sample of tissue removed during surgery. The PSA level is less than 10 and the Grade Group is 1; OR the cancer is felt during a DRE and is found in one-half or less of one side of the prostate. The PSA level is less than 10 and the Grade Group is 1.
+
+
+```{r stage 1 image}
+knitr::include_graphics("C:/Users/gam55/Documents/Prostate-Cancer-Survival-Analysis/stage1.jpg")
+``` 
+
+
 
 
 ### The asaur 'prostatesurvival' dataset
