@@ -33,23 +33,93 @@ data("prostateSurvival")
 * Kaggle grandmaster tanulsingh077
 Mr_KnowNothing 'Prostate Cancer: In Depth Understanding,EDA , Model' - https://www.kaggle.com/code/tanulsingh077/prostate-cancer-in-depth-understanding-eda-model
 
-*Oxford Very Short Introductions: Cancer
+* Oxford Very Short Introductions: Cancer
 
-*Oxford Concise Colour Medical Dictionary  
+* Oxford Concise Colour Medical Dictionary 
+
+* "Prostate Cancer Overview" (https://www.youtube.com/watch?v=ZdU5uvyafo4) and "What You Need To Know About Prostate Cancer" (https://www.youtube.com/watch?v=u4O4yNvkpqQ)  by Dr.Matthew Cooperberg from the University of California Television Youtube Channel. Abbreviated ***UCTV*** . 
+
+* US Government National Cancer Institute "Prostate Cancer Treatment (PDQ®)–Health Professional Version" - https://www.cancer.gov/types/prostate/hp/prostate-treatment-pdq . Abbreviated ***NCI*** .
+
+### Prostate Cancer Overview
+
+* The 'NCI Dictionary of Cancer Terms' defines the prostate as "A gland in the male reproductive system. The prostate surrounds the part of the urethra (the tube that empties the bladder) just below the bladder, and produces a fluid that forms part of the semen."
+
+```{r lower abdomen picture}
+knitr::include_graphics("C:/Users/gam55/Documents/Prostate-Cancer-Survival-Analysis/prostate_cross_section.jpg")
+```
+
+
+
+
+* Prostate cancer is the abnormal growth of cells in the prostate gland. The cancer cells that metastasise to the bones or other body parts are still prostate cancer.
+
+* In the USA, prostate cancer is one of the most common cancers and has one of the highest mortalities - 
+
+```{r prostate cancer statistics}
+knitr::include_graphics("C:/Users/gam55/Documents/Prostate-Cancer-Survival-Analysis/prostate_cancer_2022.png")
+```
+
+
+* Cancer cells arising in the prostate is not uncommon with aging - 
+
+```{r prostate cancer asa  feature of aging graph}
+knitr::include_graphics("C:/Users/gam55/Documents/Prostate-Cancer-Survival-Analysis/prostate_cancer_cells_w_age.png")
+```
+
+* Most men diagnosed with prostate cancer would not know they had it without screening, with most men dieing of other causes. *Aggresive* prostate cancers can spread and be lethal - these need to be found before metastasis. 
+
+* Prostate cancer is usually slow in growing. ***Five-year survival rate is ~100% for localised cancer***. Even high men with the advanced disease usually live for years with modern treatment. 
+
+* The median age of diagnosis is 67 years old [NCI]
+
+* There are several ways of screening and detecting for prostate cancer: having a prostate specific antigen (PSA) blood test; digital rectal exam where a doctor feels the prostate through the rectum; prostate biopsy giving a Gleason pattern/score/grade; additional imaging like bone and CT scans; RNA and Genetic testing. 
+
+* ***All above information, unless otherwise stated, found through Dr.Cooperberg's UCTV lectures.***
+
+### Prostate Cancer Symptoms and Diagnosis
+
+* **Symptoms** - Most prostate cancers are found through screening therefore prostate cancer symptoms are infrequent during diagnosis. Nonetheless, prostate tumour growth can produce symptoms of urinary obstruction: decreased urinary stream; nocturia; incomplete bladder emptying. 
+
+  These are non-specific symptoms and can also be indicative of **Benign Prostatic Hyperplasia (BPH)** - the prostate becoming enlarged, typically in older men. This can result in obstruction of the neck of the bladder, impairing urination. The bladder dilates and increased pressure is transmitted to the kidney nephrons, impairing and damaging them [Oxford Medical Dictionary].   
+  
+```{r bph image}
+knitr::include_graphics("C:/Users/gam55/Documents/Prostate-Cancer-Survival-Analysis/bph_image.jpg")
+```  
+
+  It is rare nowadays with widespread screening however prostate cancer metastasis may have already happened with symptoms of bone pain and pathological fractures.
+
+
+
+* **Diagnosis** - Different 
+
+
+### The asaur 'prostatesurvival' dataset
 
 The description of the dataset from the *"Applied Survival Analysis Using R"* ***(asaur)*** package - 
 
 "This data set contains survival times for two competing causes: time from prostate cancer diagnosis to death from prostate cancer, and time from prostate cancer diagnosis to death from other causes. 
-
 The data set also contains information on several risk factors. The data in this data set are simulated from detailed competing risk survival curves and counts of numbers of patients per group presented in Lu-Yao et al. (2009). 
 
 Thus, the simulated data presented here contain many of the characteristics of the original SEER-Medicare prostate cancer data used in Lu-Yao et al. (2009)."
 
 The dataframe has 14,294 observations on the following 5 variables:
 
-* **grade** - a factor with levels 'mode' (moderately differentiated) and 'poor' (poorly differentiated).
+* **grade** - a factor with levels 'mode' (moderately differentiated) and 'poor' (poorly differentiated). In simplified terms, moderately differentiated tumors correspond to a Gleason score of 6-7 (intermediate risk). Poorly differentiated tumors  correspond to a Gleason score of 8–10 (high risk).
 
-* **stage** - a factor with levels 'T1ab' (Stage T1, clinically diagnosed), 'T1c' (Stage T1, diagnosed via a PSA test), and 'T2' (means the cancer is completely inside the prostate gland. It can usually be seen on a scan, or felt during an examination.)
+* **stage** - a factor with levels T1ab (Stage T1, clinically diagnoseed), T1c (Stage T1, diagnosed via a PSA test), and T2 (Stage T2).
+
+* **ageGroup** - a factor with levels 66-69, 70-74, 75-79, 80+ .
+
+* **survTime** - time from diagnosis to death or last date known alive
+.
+* **status** - a censoring variable, 0, (censored), 1 (death from prostate cancer), and 2 (death from other causes).
+
+
+
+
+
+
 
 
 
