@@ -16,7 +16,8 @@ knitr::opts_chunk$set(echo = TRUE,warning = FALSE, message = FALSE)
 
 pacman::p_load(tidyverse,icd,knitr,kableExtra,finalfit,lubridate,data.table,
                janitor,flextable,survival,survminer,cmprsk,rmdHelpers, ggrepel,
-               scales,RColorBrewer,GGally,randomForest, caret,DT,asaur,patchwork)
+               scales,RColorBrewer,GGally,randomForest, caret,DT,asaur,patchwork,
+               car,vcd)
 
 data("prostateSurvival")
 
