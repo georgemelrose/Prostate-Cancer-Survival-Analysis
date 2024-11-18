@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE,warning = FALSE, message = FALSE)
 
 pacman::p_load(tidyverse,icd,knitr,kableExtra,finalfit,lubridate,data.table,
                janitor,flextable,survival,survminer,cmprsk,rmdHelpers, ggrepel,
-               scales,RColorBrewer,GGally,randomForest, caret,DT,asaur)
+               scales,RColorBrewer,GGally,randomForest, caret,DT,asaur,patchwork)
 
 data("prostateSurvival")
 
@@ -139,11 +139,11 @@ The dataframe has 14,294 observations on the following 5 variables:
 
 * **grade** - a factor with levels 'mode' (moderately differentiated) and 'poor' (poorly differentiated). In simplified terms, moderately differentiated tumors correspond to a Gleason score of 6-7 (intermediate risk). Poorly differentiated tumors  correspond to a Gleason score of 8–10 (high risk).
 
-* **stage** - a factor with levels T1ab (Stage T1, clinically diagnoseed), T1c (Stage T1, diagnosed via a PSA test), and T2 (Stage T2).
+* **stage** - a factor with levels T1ab (Stage T1, clinically diagnosed), T1c (Stage T1, diagnosed via a PSA test), and T2 (Stage T2).
 
 * **ageGroup** - a factor with levels 66-69, 70-74, 75-79, 80+ .
 
-* **survTime** - time from diagnosis to death or last date known alive
+* **survTime** - time from diagnosis to death or last date known alive. Not stated in the asaur package's description of the data but this is presumably in days.
 .
 * **status** - a censoring variable, 0, (censored), 1 (death from prostate cancer), and 2 (death from other causes).
 
@@ -157,7 +157,7 @@ The dataframe has 14,294 observations on the following 5 variables:
 
 
 
-## 1 - Formatting & Initial look at Data
+## 1 - Formatting & Initial look at 'asaur' Data
 
 
 ```{r looking at the dataset}
@@ -165,3 +165,415 @@ str(prostateSurvival)
 
 datatable(prostateSurvival)
 ```
+
+```{r making a factor version of the status variable}
+prostateSurvival$status_factor <- factor(
+  prostateSurvival$status, 
+  levels = c(0, 1, 2), 
+  labels = c("Censored", "Death from Prostate Cancer", "Death from Other Causes")
+)
+```
+
+
+```{r making death variables}
+# Create a new death variable with "No" as the first level
+prostateSurvival$death <- factor(
+  ifelse(prostateSurvival$status_factor %in% c("Death from Prostate Cancer", "Death from Other Causes"), "Yes", "No"),
+  levels = c("No", "Yes")  # Specify the order of levels: "No" first, then "Yes"
+)
+
+# Create a new binary death variable
+prostateSurvival$death_binary <- ifelse(prostateSurvival$status_factor %in% c("Death from Prostate Cancer", "Death from Other Causes"), 1, 0)
+
+```
+
+
+```{r checking the levels of factor variables}
+levels(prostateSurvival$grade)
+
+levels(prostateSurvival$stage)
+
+levels(prostateSurvival$ageGroup)
+
+levels(prostateSurvival$status_factor)
+
+#above levels for each variable are all correct#
+```
+
+```{r get overviews of numeric and factor variables seperately using finalfit glimpse function}
+p <- ff_glimpse(prostateSurvival)
+
+continuous_glimpse <- as.data.frame(p$Continuous)
+
+categorical_glimpse <- as.data.frame(p$Categorical)
+
+flextable(continuous_glimpse)
+
+flextable(categorical_glimpse)
+
+```
+
+There are several points to note from the above glimpse results. There is no missing data in this dataset -  
+
+* **survTime** - The minimum and maximum survival times are 0 and 119 days respectively. The mean survival time is 39 times with a high standard deviation of 31.1 . 
+
+* **grade** - There are 10,988 rows (77%) with "mode" and 3,306 rows (23%) with poor.
+
+* **stage** - There are 3,881 (27%) rows with "T1ab", 4,493 (31%) with "T1c", and 5,920 (41%) with "T2". 
+
+* **ageGroup** - There are 1,423 (10%) rows with "66-69", 2,952 (21%) with "70-74", and 4,313 (30%) with "75-79", and 5,606 (39%) with "80+". 
+
+* **status_factor** - There are 10,255 rows (71.7%) with "Censored", 799 (5.6%) with "Death from Prostate Cancer", and 3,240(22.7%) with 2 "Death from Other Causes".
+
+```{r counting and plotting distribution of grades}
+grade_counts <- prostateSurvival %>%
+  group_by(grade) %>%
+  summarise(patient_count = n()) %>%
+  mutate(percentage = (patient_count / sum(patient_count)) * 100,
+        percentage = signif(percentage, 3)) %>%
+  arrange(grade)
+
+
+
+ggplot(grade_counts, aes(x = grade, y = patient_count)) +
+  geom_col(fill = "blue", alpha = 0.8) +
+  geom_text(aes(label = patient_count), vjust = -0.5, size = 3.5, color = "darkblue") +
+  scale_y_continuous(labels = comma) +
+  labs(title = "Number of Patients by Grade",
+       x = "Grade",
+       y = "Number of Patients") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 12),
+    axis.title.x = element_text(size = 12, face = "bold"),
+    axis.title.y = element_text(size = 12, face = "bold"),
+    axis.text.x = element_text(hjust = 1),
+    panel.grid.major = element_line(size = 0.1, linetype = 'dotted'),
+    panel.grid.minor = element_blank()
+  ) 
+```
+
+
+```{r counting and plotting distribution of Age Group}
+age_counts <- prostateSurvival %>%
+  group_by(ageGroup) %>%
+  summarise(patient_count = n()) %>%
+  mutate(percentage = (patient_count / sum(patient_count)) * 100,
+        percentage = signif(percentage, 3)) %>%
+  arrange(ageGroup)
+
+
+
+ggplot(age_counts, aes(x = ageGroup, y = patient_count)) +
+  geom_col(fill = "turquoise", alpha = 0.8) +
+  geom_text(aes(label = patient_count), vjust = -0.5, size = 3.5, color = "black") +
+  scale_y_continuous(labels = comma) +
+  labs(title = "Number of Patients by Age Group",
+       x = "Age Group",
+       y = "Number of Patients") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 12),
+    axis.title.x = element_text(size = 12, face = "bold"),
+    axis.title.y = element_text(size = 12, face = "bold"),
+    axis.text.x = element_text(hjust = 1),
+    panel.grid.major = element_line(size = 0.1, linetype = 'dotted'),
+    panel.grid.minor = element_blank()
+  )
+```
+
+```{r counting and plotting distribution of stage}
+stage_counts <- prostateSurvival %>%
+  group_by(stage) %>%
+  summarise(patient_count = n()) %>%
+  mutate(percentage = (patient_count / sum(patient_count)) * 100,
+        percentage = signif(percentage, 3)) %>%
+  arrange(stage)
+
+
+
+ggplot(stage_counts, aes(x = stage, y = patient_count)) +
+  geom_col(fill = "purple", alpha = 0.8) +
+  geom_text(aes(label = patient_count), vjust = -0.5, size = 3.5, color = "black") +
+  scale_y_continuous(labels = comma) +
+  labs(title = "Number of Patients by Stage",
+       x = "Stage",
+       y = "Number of Patients") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 12),
+    axis.title.x = element_text(size = 12, face = "bold"),
+    axis.title.y = element_text(size = 12, face = "bold"),
+    axis.text.x = element_text(hjust = 1),
+    panel.grid.major = element_line(size = 0.1, linetype = 'dotted'),
+    panel.grid.minor = element_blank()
+  )
+```
+
+
+
+
+```{r counting and plotting distribution of Survival Status}
+surv_counts <- prostateSurvival %>%
+  group_by(status_factor) %>%
+  summarise(patient_count = n()) %>%
+  mutate(percentage = (patient_count / sum(patient_count)) * 100,
+        percentage = signif(percentage, 3)) %>%
+  arrange(surv_counts)
+
+
+
+ggplot(surv_counts, aes(x = status_factor, y = patient_count)) +
+  geom_col(fill = "brown", alpha = 0.8) +
+  geom_text(aes(label = patient_count), vjust = -0.5, size = 3.5, color = "black") +
+  scale_y_continuous(labels = comma) +
+  labs(title = "Number of Patients by Survival Status",
+       x = "Status",
+       y = "Number of Patients") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 12),
+    axis.title.x = element_text(size = 12, face = "bold"),
+    axis.title.y = element_text(size = 12, face = "bold"),
+    axis.text.x = element_text(hjust = 0.5, vjust = 1),
+    panel.grid.major = element_line(size = 0.1, linetype = 'dotted'),
+    panel.grid.minor = element_blank()
+  )
+```
+
+## 2 - EDA of 'asaur' Data
+
+
+```{r plotting the association of stage variable with survival status}
+
+p1 <- prostateSurvival %>% 
+  ggplot(aes(x = stage, fill = status_factor)) + 
+  geom_bar() + 
+  theme(legend.position = "none")
+
+p2 <- prostateSurvival %>% 
+  ggplot(aes(x = stage, fill = status_factor)) + 
+  geom_bar(position = "fill") + 
+  ylab("proportion")
+
+p1 + p2
+```
+
+As the above plots show, the vast majority of patients are censored in this dataset so it makes more sense to remove these rows to have a better insight if the 'tumour' stage affects death from survival status (status_factor).
+
+```{r plotting the association of stage variable with survival status without censoring}
+
+prostateSurvival_wo_censoring <- prostateSurvival %>% filter(status != 0)
+
+p1 <- prostateSurvival_wo_censoring  %>% 
+  ggplot(aes(x = stage, fill = status_factor)) + 
+  geom_bar() + 
+  theme(legend.position = "none")
+
+p2 <- prostateSurvival_wo_censoring  %>% 
+  ggplot(aes(x = stage, fill = status_factor)) + 
+  geom_bar(position = "fill") + 
+  ylab("proportion")
+
+p1 + p2
+```
+
+
+Much better, now we can clearly see that the proportion of patients who die from prostate cancer increases as the stage increases. 
+
+For 'ageGroup' and 'grade' as well - 
+
+```{r plotting the association of age group variable with survival status}
+
+p1 <- prostateSurvival_wo_censoring  %>% 
+  ggplot(aes(x = ageGroup, fill = status_factor)) + 
+  geom_bar() + 
+  theme(legend.position = "none")
+
+p2 <- prostateSurvival_wo_censoring  %>% 
+  ggplot(aes(x = ageGroup, fill = status_factor)) + 
+  geom_bar(position = "fill") + 
+  ylab("proportion")
+
+p1 + p2
+```
+
+In the above faceted bar charts we can see that most deaths are skewed towards the older age groups and that the proportion of patients dying from prostate cancer stays the same from 66-69 to 70-74, there is an increase for 75-79 and 80+. 
+
+
+```{r plotting the association of grade variable with survival status}
+
+p1 <- prostateSurvival_wo_censoring  %>% 
+  ggplot(aes(x = grade, fill = status_factor)) + 
+  geom_bar() + 
+  theme(legend.position = "none")
+
+p2 <- prostateSurvival_wo_censoring  %>% 
+  ggplot(aes(x = grade, fill = status_factor)) + 
+  geom_bar(position = "fill") + 
+  ylab("proportion")
+
+p1 + p2
+```
+
+Again, when the grade moves to the more severe 'poorly differentiated' (a higher Gleason grade), the deaths from prostate cancer increase in proportion. 
+
+```{r faceted bar plot of deaths by prostate cancer and deaths by other causes for patients of different age groups aggregated by tumour grade and stage }
+p1 <- prostateSurvival_wo_censoring %>% 
+  ggplot(aes(x = ageGroup, fill=status_factor)) + 
+  geom_bar(position = position_stack(reverse = TRUE)) +
+  facet_grid(grade ~ stage) + 
+  theme(legend.position = "none")
+
+p2 <- prostateSurvival_wo_censoring %>% 
+  ggplot(aes(x = ageGroup, fill=status_factor)) + 
+  geom_bar(position = position_fill(reverse = TRUE)) +
+  facet_grid(grade ~ stage)+ 
+  theme(legend.position = "bottom") + 
+  ylab("proportion")
+
+p1 / p2
+```
+
+Analysing the above faceted bar plots, one can see that count of deaths always rises with age, in all different levels of the factor variables. The proportions table below shows no obvious correlation between death and prostate cancer, with a particular facet except for perhaps "T1ab"&"mode" and "T2"&"poor" where the proportions of death from prostate cancer rise with age slightly. 
+
+```{r factor summary table with chi squared tests}
+# Remove unused levels from the factor
+prostateSurvival_wo_censoring$status_factor <- droplevels(prostateSurvival_wo_censoring$status_factor)
+
+# Check the levels after removal
+levels(prostateSurvival_wo_censoring$status_factor)
+
+tbl <- prostateSurvival_wo_censoring %>% summary_factorlist(dependent = "status_factor", explanatory = c("grade", "stage", "ageGroup"), p = TRUE)
+
+datatable(tbl)
+```
+
+The above table shows multiple variables by outcome with hypothesis tests: Death by Prostate Cancer vs Death by Other Causes for by age group and grade & stage of prostate tumour. 
+
+* The difference between mode (359 deaths) and poor grade (440 deaths) categories is statistically significant (p < 0.001). Poor grade has a higher percentage of deaths from prostate cancer (55.1%) compared to mode (44.9%), and a lower percentage of deaths from other causes (25.2% vs 74.8%). 
+
+* The stage of cancer (T1ab, T1c, T2) is significantly related to the distribution of death causes (p < 0.001). T2 stage has the highest percentage of deaths from prostate cancer (51.3%), while T1ab has the lowest (23.4%). This suggests that patients with T2 stage cancer are more likely to die from prostate cancer, whereas those with T1ab may have a higher proportion of deaths from other causes.
+
+* The age group variable shows a statistically significant association (p = 0.001) between age and the cause of death. As age increases, the percentage of deaths from prostate cancer rises, particularly in the 80+ group (55.6%). Conversely, the percentage of deaths from other causes is higher in the younger age groups, although the difference is not as stark as for prostate cancer. Older patients are more likely to die from prostate cancer, possibly due to the longer duration of their disease.
+
+## 3 - Fitting a Logistic Regression model on 'asaur' Data
+
+
+### EDA
+
+
+```{r faceted bar plot of deaths  for patients of different age groups aggregated by tumour grade and stage }
+p1 <- prostateSurvival %>% 
+  ggplot(aes(x = ageGroup, fill=death)) + 
+  geom_bar(position = position_stack(reverse = FALSE)) +
+  facet_grid(grade ~ stage) + 
+  theme(legend.position = "none")
+
+p2 <- prostateSurvival %>% 
+  ggplot(aes(x = ageGroup, fill=death)) + 
+  geom_bar(position = position_fill(reverse = FALSE)) +
+  facet_grid(grade ~ stage)+ 
+  theme(legend.position = "bottom") + 
+  ylab("proportion")
+
+p1 / p2
+```
+
+
+
+```{r chi squared tests comparing no deaths to deaths}
+dependent <- "death"
+explanatory <- c("grade", "stage", "ageGroup")
+tbl <- prostateSurvival %>% 
+  summary_factorlist(dependent, explanatory, p = TRUE,
+                     add_dependent_label = TRUE)
+
+datatable(tbl)
+```
+
+Interpreting the chi-squared test results of the above table.
+
+* The grade of the disease is strongly associated with whether the patient is censored or has died (p < 0.001). A higher proportion of individuals with a poor grade die (31.1%), compared to those with a mode grade (20%).
+
+* There is a significant relationship between stage and the cause of death or censoring (p < 0.001). As the cancer stage progresses from T1ab to T2, the likelihood of death (rather than being censored) increases. Specifically, patients in the T2 stage have the highest proportion of deaths (43.5%) compared to those at T1ab and T1c.
+
+* The age group is also significantly associated with death or censoring (p < 0.001). As age increases, the likelihood of dying (rather than being censored) increases, particularly in the 80+ group, where more than half of the individuals (51.5%) have died, compared to 5.7% in the 66-69 age group.
+
+
+### Model Assumptions
+
+From the ***HealthyR*** textbook - 
+
+The assumptions are:
+
+1.Binary dependent variable - this is obvious, but as above we need to check (alive, death from disease, death from other causes doesn’t work);
+
+2. Independence of observations - the observations should not be repeated measurements or matched data;
+
+3. Linearity of continuous explanatory variables and the log-odds outcome - take age as an example. If the outcome, say death, gets more frequent or less frequent as age rises, the model will work well. However, say children and the elderly are at high risk of death, but those in middle years are not, then the relationship is not linear. Or more correctly, it is not monotonic, meaning that the response does not only go in one direction;
+
+
+4. No multicollinearity - explanatory variables should not be highly correlated with each other.
+
+```{r Multicollinearity}
+library(GGally)
+
+prostateSurvival %>% 
+  remove_labels() %>%  # ggpairs doesn't work well with labels
+  ggpairs(columns = explanatory)
+```
+
+```{r}
+# Load necessary package for Cramér's V
+library(vcd)
+
+# Create a contingency table for the categorical variables
+table_data <- table(prostateSurvival$grade, prostateSurvival$stage)
+
+# Calculate Cramér's V statistic
+assocstats(table_data)
+
+```
+
+```{r}
+# Create a contingency table for the categorical variables
+table_data <- table(prostateSurvival$grade, prostateSurvival$ageGroup)
+
+# Calculate Cramér's V statistic
+assocstats(table_data)
+```
+
+```{r}
+# Create a contingency table for the categorical variables
+table_data <- table(prostateSurvival$stage, prostateSurvival$ageGroup)
+
+# Calculate Cramér's V statistic
+assocstats(table_data)
+```
+
+```{r}
+
+# Fit a linear model (you can use any suitable model, here just for the sake of the example)
+model <- lm(death_binary ~ grade + stage + ageGroup, data = prostateSurvival)
+
+# Calculate VIF
+car::vif(model)
+
+```
+
+```{r}
+prostateSurvival %>% finalfit(dependent, explanatory, metrics = TRUE)
+
+```
+```{r}
+explanatory = c("grade", "ageGroup")
+
+prostateSurvival %>% finalfit(dependent, explanatory, metrics = TRUE)
+```
+
+
