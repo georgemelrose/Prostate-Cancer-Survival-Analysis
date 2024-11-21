@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE,warning = FALSE, message = FALSE)
 pacman::p_load(tidyverse,icd,knitr,kableExtra,finalfit,lubridate,data.table,
                janitor,flextable,survival,survminer,cmprsk,rmdHelpers, ggrepel,
                scales,RColorBrewer,GGally,randomForest, caret,DT,asaur,patchwork,
-               car,vcd)
+               car,vcd,htmlwidgets)
 
 data("prostateSurvival")
 
@@ -49,7 +49,7 @@ data("prostateSurvival")
 knitr::include_graphics("C:/Users/gam55/Documents/Prostate-Cancer-Survival-Analysis/prostate_cross_section.jpg")
 ```
 
-
+[Image adapted from NCI *Prostate Cancer Treatment (PDQ®)–Health Professional Version*]
 
 
 * Prostate cancer is the abnormal growth of cells in the prostate gland. The cancer cells that metastasise to the bones or other body parts are still prostate cancer.
@@ -87,7 +87,7 @@ knitr::include_graphics("C:/Users/gam55/Documents/Prostate-Cancer-Survival-Analy
 ```{r bph image}
 knitr::include_graphics("C:/Users/gam55/Documents/Prostate-Cancer-Survival-Analysis/bph_image.jpg")
 ```  
-
+[Image adapted from NCI *Prostate Cancer Treatment (PDQ®)–Health Professional Version*]
 
 
 * **Diagnosis** - Different tests and procedures can be used to diagnose prostate cancer. A **Digital Rectal Exam (DRE)** is when a clinician inserts a finger into the rectum to feel the prostate through the rectal wall for abnormalities. 
@@ -95,8 +95,26 @@ knitr::include_graphics("C:/Users/gam55/Documents/Prostate-Cancer-Survival-Analy
 ```{r dre image}
 knitr::include_graphics("C:/Users/gam55/Documents/Prostate-Cancer-Survival-Analysis/dre.jpg")
 ```  
+[Image adapted from NCI *Prostate Cancer Treatment (PDQ®)–Health Professional Version*]
 
 **Prostate-specific antigen (PSA) test** - A test to measure the levels of PSA in the blood. PSA levels are elevated in prostate cancer but can also be elevated by stress and inflammation on the prostate - after a long bicycle ride for example.
+
+```{r UK GOV PSA image}
+knitr::include_graphics("C:/Users/gam55/Documents/Prostate-Cancer-Survival-Analysis/uk_gov_psa_guidance.jpg")
+```  
+[Image adapted from *Guidance updated on PSA testing for prostate cancer*]
+
+
+```{r UK GOV PSA image}
+knitr::include_graphics("C:/Users/gam55/Documents/Prostate-Cancer-Survival-Analysis/uk_gov_psa_guidance.jpg")
+```  
+
+```{r UK GOV PSA image}
+knitr::include_graphics("C:/Users/gam55/Documents/Prostate-Cancer-Survival-Analysis/fig3_psa.jpg")
+```  
+
+[Table adapted from table 3 of Parhiban et al. 2016, Journal of Medical Sciences and Health]
+
 
 **Prostate-specific membrane antigen (PSMA) Positron Emission Tomography (PET) scan** - An imaging procedure to help find prostate cancer cells that have spread outside of the prostate, into bone, lymph nodes, or other organs. A cell-targeting molecule linked to a radioactive substance is injected into the body and travels through the blood. It attaches to a protein called PSMA that is found on the surface of prostate cancer cells. A PET scanner detects high concentrations of the radioactive molecule and shows where the prostate cancer cells are in the body. 
 
@@ -109,7 +127,9 @@ knitr::include_graphics("C:/Users/gam55/Documents/Prostate-Cancer-Survival-Analy
 
 **Transrectal magnetic resonance imaging (MRI)** - A probe that gives off radio waves is inserted into the rectum near the prostate. This helps the MRI machine make clearer pictures of the prostate and nearby tissue. A transrectal MRI is done to find out if the cancer has spread outside the prostate into nearby tissues. This procedure is also called nuclear magnetic resonance imaging (NMRI). Transrectal MRI may be used during a biopsy procedure -  transrectal MRI guided biopsy.
 
-### Staging Prostate Cacner using the Grade Group and PSA Level
+### Staging Prostate Cancer using the TNM, Gleason Score;Gleason Pattern (Grade Group) and PSA Level
+
+**Grade Groups or Gleason score**
 
 If cancer is found, it will be given a grade. The grade of the cancer describes how abnormal the cancer cells look under a microscope and how quickly the cancer is likely to spread. The grade is also called the **Gleason score**.
 
@@ -117,14 +137,48 @@ The prostate tissue samples are checked to see how much the tumor tissue is like
 
 The Gleason score can range from 6 to 10. The higher the Gleason score, the more likely the cancer will metastasise. A score of 6 is a low-grade cancer; a score of 7 is a medium-grade cancer; and a score of 8, 9, or 10 is a high-grade cancer. For example, if the most common tissue pattern is grade 3 and the secondary pattern is grade 4, it means that most of the cancer is grade 3 and less of the cancer is grade 4. The grades are added for a Gleason score of 7, and it is a medium-grade cancer. The score may be written as 3+4=7, Gleason 7/10, or combined Gleason score of 7.
 
-* **Stage I** - Cancer is only in the prostate. The cancer is not felt during a DRE and is found by needle biopsy done for high PSA level or in a sample of tissue removed during surgery. The PSA level is less than 10 and the Grade Group is 1; OR the cancer is felt during a DRE and is found in one-half or less of one side of the prostate. The PSA level is less than 10 and the Grade Group is 1.
+```{r stage 1 image}
+knitr::include_graphics("C:/Users/gam55/Documents/Prostate-Cancer-Survival-Analysis/CRUK_grade_groups.png")
+``` 
+[Image adapted from CRUK Prostate Cancer Website]
 
+**TNM Staging**
+
+**Tumour (T)**
+
+Tumour describes the size or area of the cancer.There are 4 overall T stages of prostate cancer – T1 to T4.
+
+**T1**
+
+T1 means the cancer is too small to be seen on a scan, or felt during an examination of the prostate. It’s divided into T1a, T1b and T1c.
+
+**T1a** - that the cancer is in less than 5% of the removed tissue.
+
+**T1b** - that the cancer is in 5% or more of the removed tissue.
+
+**T1c** - cancers are found by biopsy,for example after a raised PSA level.
+
+**T2** 
+
+The cancer is completely inside the prostate gland.
+
+**T3**
+
+T3 means the cancer has broken through the capsule (covering) of the prostate gland.
+
+**T3a** - the cancer has broken through the capsule (covering) of the prostate gland.
+
+**T3b** - the cancer has spread into the tubes that seminal vesicles.
 
 ```{r stage 1 image}
 knitr::include_graphics("C:/Users/gam55/Documents/Prostate-Cancer-Survival-Analysis/stage1.jpg")
 ``` 
 
 
+
+```{r stage 1 image}
+knitr::include_graphics("C:/Users/gam55/Documents/Prostate-Cancer-Survival-Analysis/stage1.jpg")
+``` 
 
 
 ### The asaur 'prostatesurvival' dataset
@@ -140,7 +194,7 @@ The dataframe has 14,294 observations on the following 5 variables:
 
 * **grade** - a factor with levels 'mode' (moderately differentiated) and 'poor' (poorly differentiated). In simplified terms, moderately differentiated tumors correspond to a Gleason score of 6-7 (intermediate risk). Poorly differentiated tumors  correspond to a Gleason score of 8–10 (high risk).
 
-* **stage** - a factor with levels T1ab (Stage T1, clinically diagnosed), T1c (Stage T1, diagnosed via a PSA test), and T2 (Stage T2).
+* **stage** - a factor with levels T1ab (Stage T1, clinically diagnosed), T1c (Stage T1, diagnosed via a PSA test and a biopsy), and T2 (Stage T2, the cancer is completely in the prostate gland).
 
 * **ageGroup** - a factor with levels 66-69, 70-74, 75-79, 80+ .
 
@@ -323,7 +377,7 @@ surv_counts <- prostateSurvival %>%
   summarise(patient_count = n()) %>%
   mutate(percentage = (patient_count / sum(patient_count)) * 100,
         percentage = signif(percentage, 3)) %>%
-  arrange(surv_counts)
+  arrange(status_factor)
 
 
 
@@ -423,21 +477,53 @@ p1 + p2
 
 Again, when the grade moves to the more severe 'poorly differentiated' (a higher Gleason grade), the deaths from prostate cancer increase in proportion. 
 
-```{r faceted bar plot of deaths by prostate cancer and deaths by other causes for patients of different age groups aggregated by tumour grade and stage }
+```{r faceted bar plot of deaths by prostate cancer and deaths by other causes}
 p1 <- prostateSurvival_wo_censoring %>% 
-  ggplot(aes(x = ageGroup, fill=status_factor)) + 
+  ggplot(aes(x = ageGroup, fill = status_factor)) + 
   geom_bar(position = position_stack(reverse = TRUE)) +
-  facet_grid(grade ~ stage) + 
+  facet_grid(grade ~ stage) +
+  labs(
+    x = "Age Group",
+    y = "Count",
+    fill = "Outcome" # Setting the legend title
+  ) +
+  theme_minimal() +
   theme(legend.position = "none")
 
 p2 <- prostateSurvival_wo_censoring %>% 
-  ggplot(aes(x = ageGroup, fill=status_factor)) + 
+  ggplot(aes(x = ageGroup, fill = status_factor)) + 
   geom_bar(position = position_fill(reverse = TRUE)) +
-  facet_grid(grade ~ stage)+ 
-  theme(legend.position = "bottom") + 
-  ylab("proportion")
+  facet_grid(grade ~ stage) +
+  labs(
+    x = "Age Group",
+    y = "Proportion",
+    fill = "Outcome" # Setting the legend title
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    legend.title = element_text(size = 10),
+    legend.text = element_text(size = 9))
 
-p1 / p2
+# Combine plots using patchwork
+combined_plot <- p1 / p2 + 
+  plot_annotation(
+    subtitle = "Comparing Counts and Proportions Across Grade and Stage",
+    theme = theme(plot.title = element_text(size = 16, face = "bold"),
+                  plot.subtitle = element_text(size = 12))
+  )
+
+# Display the combined plot
+combined_plot
+
+ # Save the combined plot as an image
+# ggsave(
+#   filename = "combined_plot.png",    # File name
+#   plot = combined_plot,             # Plot object
+#   width = 10,                       # Width in inches
+#   height = 8,                       # Height in inches
+#   dpi = 300                         # Resolution in dots per inch (high-quality)
+# )
 ```
 
 Analysing the above faceted bar plots, one can see that count of deaths always rises with age, in all different levels of the factor variables. The proportions table below shows no obvious correlation between death and prostate cancer, with a particular facet except for perhaps "T1ab"&"mode" and "T2"&"poor" where the proportions of death from prostate cancer rise with age slightly. 
@@ -452,6 +538,9 @@ levels(prostateSurvival_wo_censoring$status_factor)
 tbl <- prostateSurvival_wo_censoring %>% summary_factorlist(dependent = "status_factor", explanatory = c("grade", "stage", "ageGroup"), p = TRUE)
 
 datatable(tbl)
+
+tbl_widget <- datatable(tbl)
+saveWidget(tbl_widget, "summary_table.html", selfcontained = TRUE)
 ```
 
 The above table shows multiple variables by outcome with hypothesis tests: Death by Prostate Cancer vs Death by Other Causes for by age group and grade & stage of prostate tumour. 
@@ -522,16 +611,12 @@ The assumptions are:
 4. No multicollinearity - explanatory variables should not be highly correlated with each other.
 
 ```{r Multicollinearity}
-library(GGally)
-
 prostateSurvival %>% 
   remove_labels() %>%  # ggpairs doesn't work well with labels
   ggpairs(columns = explanatory)
 ```
 
 ```{r}
-# Load necessary package for Cramér's V
-library(vcd)
 
 # Create a contingency table for the categorical variables
 table_data <- table(prostateSurvival$grade, prostateSurvival$stage)
